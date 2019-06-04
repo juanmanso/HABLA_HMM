@@ -42,7 +42,6 @@ for i=2:nMinOne,
       - 0.5 * (X * invSig{i}) * X' + logDetVars2(i);
 end;
 alpha = alpha(:);
-%alfa = alpha;		% Para mandarlo afuera
 alfa = alpha';		% Para mandarlo afuera
 
 % Do the forward recursion
@@ -53,34 +52,8 @@ for t = 2:numPts,
     alpha(i) = logsum( alphaBefore(2:nMinOne) + logTrans(2:nMinOne,i) ) ...
 	- 0.5 * (X * invSig{i}) * X' + logDetVars2(i);
   end;
-%	alfa = [alfa alpha];		% Para mandarlo afuera
 	alfa = [alfa; alpha'];		% Para mandarlo afuera
 end;
 
 % Terminate the recursion with the final state
 logProb =  logsum( alpha(2:nMinOne) + logTrans(2:nMinOne,numStates) );
-
-%=================================
-%function result = logsum(logv)
-%
-%len = length(logv);
-%if (len<2);
-%  error('Subroutine logsum cannot sum less than 2 terms.');
-%end;
-%
-%% First two terms
-%if (logv(2)<logv(1)),
-%  result = logv(1) + log( 1 + exp( logv(2)-logv(1) ) );
-%else,
-%  result = logv(2) + log( 1 + exp( logv(1)-logv(2) ) );
-%end;
-%
-%% Remaining terms
-%for (i=3:len),
-%  term = logv(i);
-%  if (result<term),
-%    result = term   + log( 1 + exp( result-term ) );
-%  else,
-%    result = result + log( 1 + exp( term-result ) );
-%  end;    
-%end;
