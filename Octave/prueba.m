@@ -64,13 +64,13 @@ p_fwd = zeros(1,length(hmms));
 for k = 1:length(hmms)
 	% Se obtienen los alfa y P(X) por medio de logfwd()
 	[p_fwd(k), logAlfa] = logfwd(X2, hmms(k));
-	hmms(k).logAlfa = logAlfa(2:end,:);
+	hmms(k).logAlfa = logAlfa(:, 2:end);
 
 	% Cálculo del P(X) utilizando los alfa a mano.
-		logTrans = hmms(k).trans(3,2:4);
+		logTrans = hmms(k).trans(2:4,end);
 		logTrans(logTrans<1e-100)=1e-100;
 		logTrans = log(logTrans);
-	p_fwd2(k) = logsum(hmms(k).logAlfa(:,end) + logTrans);
+	p_fwd2(k) = logsum(hmms(k).logAlfa(end,:) + logTrans');
 end
 
 
@@ -92,7 +92,7 @@ p_bwd = zeros(1,length(hmms));
 for k = 1:length(hmms)
 	% Se obtienen los beta y P(X) por medio de logbwd()
 	[p_bwd(k), logBeta] = logbwd(X2, hmms(k));
-	hmms(k).logBeta = logBeta(2:end,:);
+	hmms(k).logBeta = logBeta;
 end
 
 %% Comparación de ambos
@@ -112,9 +112,26 @@ title('Comparación entre métodos de cálculo de P(X)')
 
 [p_hmm; p_fwd; p_fwd2; p_bwd; logpx]
 
+% Verifico alfa y beta
+
+
+for k = 1:6
+	alfa = hmms(k).logAlfa;
+	beta = hmms(k).logBeta;
+	p_verif(k,:) = zeros(1,length(alfa));
+
+	for i = 1:length(alfa)
+		p_verif(k,i) = logsum(alfa(i,:) + beta(i,:));
+	end
+end
+
+if(p_verif&&p_verif(:,1))
+	puts("Ok Alfa y Beta \n");
+else
+	puts("Alfa y Beta MAL \n");
+end
 
 [gama, xi] = calc_gamma_xi(X2, hmms(1));
 
-return
 
 %% Entrenamiento
